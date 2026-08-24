@@ -1,0 +1,30 @@
+# 配置模板
+
+照着这个模板填，填完写进 `project-config.md`。凭证不写在这里，用环境变量名引用。
+
+```yaml
+project:
+  name: my-project          # 项目名字，出现在清单标题里
+  workdir: /path/to/project # 项目根目录
+
+repos:
+  - path: /path/to/project
+    pull_on_start: true     # 每天开始要不要自动拉最新
+  - path: /path/to/project/packages/api
+    pull_on_start: true
+
+tracker:
+  type: generic             # generic / jira / github / gitlab，按你的系统选
+  url: https://issues.example.com
+  default_query: filter=backlog-critical   # 每天拉单的位置，保存的筛选器名或搜索链接，原样记，不许 AI 自己编
+  token_env: TRACKER_TOKEN  # 凭证从环境变量读，不写在这里
+  adapter_script: scripts/adapters/example_api.py
+
+runtime_evidence:
+  logs: /path/to/logs       # 日志目录，没有就留空
+  attachment_dir: /path/to/attachments   # 附件下载目录
+
+autonomy: L1                # L0 只读 / L1 提议 / L2 自动改 / L3 自动提交
+
+language: zh                # zh / en
+```

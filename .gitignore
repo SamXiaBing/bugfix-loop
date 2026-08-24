@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+tests/tmp/
+.DS_Store
+.codely-cli/
+PRODUCT-PLAN.md
