@@ -1,5 +1,7 @@
 # Bug Fix Loop
 
+[English](README.en.md) | **中文**
+
 一个 AI 智能体技能（Agent Skill），用来系统化地分析软件缺陷，并持续积累分析经验。
 
 ## 这是什么
@@ -107,5 +109,3 @@ python tools/check_prose.py 文件.md
 ## 许可证
 
 代码（scripts/ 和 tools/）用 MIT，见 `LICENSE`。文档用 CC BY 4.0，见 `LICENSE-docs`。
-
-English version，`README.en.md`。
