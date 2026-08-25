@@ -2,7 +2,7 @@
 """提交并推送，然后验证推送真的成功。只看 exit code 会骗人。
 
 用法
-  python git_push_verify.py <仓库> [--branch 分支] [--ref 引用]
+  python git_push_verify.py <仓库> [--branch 分支] [--ref 引用] [--lang zh|en]
 
 --ref 不填时默认 HEAD:{branch}。走审查流程的系统（比如 refs/for 风格）填
 --ref "refs/for/{branch}"。
@@ -21,6 +21,7 @@ def main():
     ap.add_argument("repo")
     ap.add_argument("--branch", default=None)
     ap.add_argument("--ref", default=None)
+    ap.add_argument("--lang", choices=["zh", "en"], default="zh")
     args = ap.parse_args()
 
     root = Path(args.repo)
@@ -33,7 +34,7 @@ def main():
         branch = proc.stdout.strip() or "HEAD"
 
     ref = (args.ref or "HEAD:{branch}").format(branch=branch)
-    print(f"推送到 {ref}")
+    print(f"推送到 {ref}" if args.lang == "zh" else f"Pushing to {ref}")
 
     proc = subprocess.run(
         ["git", "push", "origin", ref],
@@ -43,12 +44,12 @@ def main():
     print(output)
 
     if "rejected" in output.lower():
-        print("推送被拒绝，输出里有 rejected", file=sys.stderr)
+        print("推送被拒绝，输出里有 rejected" if args.lang == "zh" else "Push rejected, rejected found in the output", file=sys.stderr)
         sys.exit(1)
     if not any(m in output for m in MARKERS):
-        print("推送验证失败，输出里没有成功标记，回去看错误", file=sys.stderr)
+        print("推送验证失败，输出里没有成功标记，回去看错误" if args.lang == "zh" else "Push verification failed, no success marker in the output, check the error", file=sys.stderr)
         sys.exit(1)
-    print("推送验证通过")
+    print("推送验证通过" if args.lang == "zh" else "Push verified")
 
 
 if __name__ == "__main__":

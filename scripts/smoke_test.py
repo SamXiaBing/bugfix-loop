@@ -75,6 +75,23 @@ def test_issue_list(tmp):
         report.stdout.strip(),
     )
 
+    init_en = run_py(
+        ROOT / "scripts/issue_list.py",
+        ["init", "2026-01-16", "--lang", "en"],
+        stdin=demo.stdout,
+        cwd=tmp,
+    )
+    report_en = run_py(
+        ROOT / "scripts/issue_list.py",
+        ["report", "bugs_2026-01-16.md", "--lang", "en"],
+        cwd=tmp,
+    )
+    check(
+        "issue_list en",
+        "pending" in report_en.stdout and "Total 3" in report_en.stdout,
+        report_en.stdout.strip(),
+    )
+
 
 def test_depth_gate(tmp):
     good = tmp / "good.md"
@@ -96,6 +113,9 @@ def test_depth_gate(tmp):
     result = run_py(ROOT / "scripts/depth_gate.py", [str(bad)])
     check("depth_gate 工序不足", "工序不足" in result.stdout, result.stdout.strip())
 
+    result_en = run_py(ROOT / "scripts/depth_gate.py", [str(good), "--lang", "en"])
+    check("depth_gate en", "Process floor met" in result_en.stdout, result_en.stdout.strip())
+
 
 def test_lesson_append(tmp):
     lessons = tmp / "lessons.md"
@@ -111,6 +131,16 @@ def test_lesson_append(tmp):
         "已追加" in first.stdout and "已经记过" in second.stdout,
         second.stdout.strip(),
     )
+
+    lessons_en = tmp / "lessons_en.md"
+    args_en = [
+        "--lessons", str(lessons_en), "--lang", "en",
+        "--module", "m", "--type", "t", "--example", "E-1",
+        "--lesson", "l", "--category", "c", "--path", "p",
+    ]
+    first_en = run_py(ROOT / "scripts/lesson_append.py", args_en)
+    en_ok = first_en.returncode == 0 and "Lesson library" in lessons_en.read_text(encoding="utf-8")
+    check("lesson_append en", en_ok, first_en.stdout.strip())
 
 
 def test_git(tmp):

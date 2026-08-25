@@ -91,7 +91,7 @@ $ python scripts/depth_gate.py 当日报告.md
 | `references/project-types/` | Project-type packs, example-web is the template |
 | `scripts/` | Ready-to-run scripts, all Python standard library |
 | `tests/` | Virtual-project self tests |
-| `en/` | Translated references |
+| `en/references/` | English references, used when language=en |
 
 ## Development and self test
 

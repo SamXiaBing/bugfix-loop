@@ -2,7 +2,7 @@
 """进仓库，拉最新，看最近几天改了什么。对应基本原则里的「先看是不是已经被人修了」。
 
 用法
-  python git_recent.py <仓库路径...> [--days 3] [--path 目标文件或目录]
+  python git_recent.py <仓库路径...> [--days 3] [--path 目标文件或目录] [--lang zh|en]
 """
 
 import argparse
@@ -22,23 +22,24 @@ def main():
     ap.add_argument("repos", nargs="+")
     ap.add_argument("--days", type=int, default=3)
     ap.add_argument("--path", default=None)
+    ap.add_argument("--lang", choices=["zh", "en"], default="zh")
     args = ap.parse_args()
 
     since = (date.today() - timedelta(days=args.days)).isoformat()
     for repo in args.repos:
         root = Path(repo)
         if not (root / ".git").exists():
-            print(f"[跳过] {repo} 不是 git 仓库")
+            print(f"[跳过] {repo} 不是 git 仓库" if args.lang == "zh" else f"[skip] {repo} is not a git repo")
             continue
         print(f"===== {repo} =====")
         code, out, err = run(["git", "pull", "--ff-only"], root)
         if code != 0:
-            print(f"pull 失败，{err[:200]}")
+            print(f"pull 失败，{err[:200]}" if args.lang == "zh" else f"pull failed, {err[:200]}")
         log = ["git", "log", "--oneline", f"--since={since}"]
         if args.path:
             log += ["--", args.path]
         code, out, _ = run(log, root)
-        print(out if out else f"最近 {args.days} 天没有提交")
+        print(out if out else (f"最近 {args.days} 天没有提交" if args.lang == "zh" else f"no commits in the last {args.days} days"))
         print()
 
 

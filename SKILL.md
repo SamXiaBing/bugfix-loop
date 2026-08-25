@@ -45,7 +45,11 @@ metadata:
 | `references/autonomy-ladder.md` | 修复和提交分级 | 要改代码时 |
 | `references/pack-authoring.md` | 项目类型适配怎么写 | 想给一种新项目类型做适配时 |
 | `scripts/` | 可用脚本 | 做机械动作时 |
-| `en/` | 英文版文档 | 英文环境 |
+| `en/` | 英文版文档，language=en 时使用 | 英文环境 |
+
+## 语言
+
+`project-config.md` 的 language 字段选 zh 或 en，默认 zh。选 en 时，按 `en/references/` 下对应的英文文档执行，状态和报告用英文，脚本加 `--lang en`。
 
 ## 一条 bug 的状态
 
