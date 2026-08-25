@@ -4,6 +4,29 @@
 
 有一次批量分析八条 bug，报告说完成率 87.5%。把检查动作列出来一数，大部分 bug 其实只做了读描述和搜代码两项，运行证据一条都没拿，附件一条都没看。那些确定结论都是猜测。Bug Fix Loop 就是把这种浮躁的深度抓出来。
 
+## 这是什么
+
+一个 AI 智能体技能（Agent Skill），不是脚本库，也不是普通工具。宿主 AI（Claude Code、Cursor、Codely CLI 这类）读根目录的 `SKILL.md` 学会一套 bug 分析流程，`references/` 和 `scripts/` 是它运行时按需加载的文档和脚本。
+
+## 安装
+
+把整个目录放进你宿主的技能目录。以 Claude Code 为例，一条命令装好。
+
+```bash
+git clone https://github.com/SamXiaBing/bugfix-loop ~/.claude/skills/bugfix-loop
+```
+
+其他宿主换成对应的技能目录。
+
+| 宿主 | 技能目录 |
+|------|---------|
+| Claude Code | `~/.claude/skills/bugfix-loop/` 或项目 `.claude/skills/` |
+| Cursor | `.cursor/skills/bugfix-loop/` |
+| Codely CLI | `~/.codely-cli/skills/bugfix-loop/` |
+| oo | `oo skills adopt <本目录>` |
+
+装完怎么确认，对 AI 说"分析 bug"或者"拉今天的单"，它应该按 `references/loop.md` 的流程开始。
+
 ## 它靠什么站住
 
 修 bug 难在判断，不在跑流程。拿单、下日志、搜代码、提交这些步骤谁都会，难的是判断症状属于哪一层，以及证据够不够下结论。这个 skill 的活就是判断，下根因、给结论、提修法。

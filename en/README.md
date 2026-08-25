@@ -4,6 +4,29 @@ Conclusions from AI bug analysis no longer read like guesses.
 
 Once eight bugs were analyzed in a batch, and the report claimed 87.5% completion. Listing the check actions, most bugs only had reading the description and searching code done, runtime evidence was never collected, attachments were never looked at. Those confirmed conclusions were guesses. Bug Fix Loop exists to catch that kind of shallow depth.
 
+## What this is
+
+An AI agent skill, not a script library and not an ordinary tool. The host agent (Claude Code, Cursor, Codely CLI and similar) reads `../SKILL.md` at the repo root to learn a systematic bug-analysis workflow, and `../references/` plus `../scripts/` are the docs and scripts it loads on demand.
+
+## Install
+
+Put the whole directory into your host's skill directory, one command:
+
+```bash
+git clone https://github.com/SamXiaBing/bugfix-loop ~/.claude/skills/bugfix-loop
+```
+
+Other hosts, use their skill directory:
+
+| Host | Skill directory |
+|------|-----------------|
+| Claude Code | `~/.claude/skills/bugfix-loop/` or project `.claude/skills/` |
+| Cursor | `.cursor/skills/bugfix-loop/` |
+| Codely CLI | `~/.codely-cli/skills/bugfix-loop/` |
+| oo | `oo skills adopt <this directory>` |
+
+To confirm the install, tell the AI "analyze a bug" or "pull today's tickets". It should start the flow in `../references/loop.md`.
+
 ## What holds it up
 
 Fixing bugs is hard because of judgment, not because of process. Pulling tickets, reading logs, searching code, committing, everyone can do those. The hard part is deciding which layer the symptom belongs to, and whether the evidence is enough to conclude. Judging is exactly this skill's job. It finds root causes, writes conclusions, proposes fixes.
