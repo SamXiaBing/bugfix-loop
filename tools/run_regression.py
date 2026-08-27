@@ -328,8 +328,8 @@ def generate_iteration_report(cards):
     report_path = RESULTS / f"iteration-{next_num:03d}.md"
 
     lines = [f"# 回归测试迭代 {next_num:03d}", ""]
-    lines.append(f"日期：{today}")
-    lines.append(f"测试用例数：{len(cards)}")
+    lines.append(f"日期 {today}")
+    lines.append(f"测试用例数 {len(cards)}")
     lines.append("")
 
     # 总览
@@ -370,8 +370,8 @@ def generate_iteration_report(cards):
         lines.append("")
         for case_id, case_name, item in failures:
             lines.append(f"### {case_id} {case_name} - {item['description']}")
-            lines.append(f"- 权重：{item['weight']}")
-            lines.append(f"- 详情：{item['detail']}")
+            lines.append(f"- 权重 {item['weight']}")
+            lines.append(f"- 详情 {item['detail']}")
             lines.append("")
 
     # 按规则统计

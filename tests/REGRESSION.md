@@ -6,7 +6,7 @@
 
 Agent Skill 的行为是 LLM 读文档后做出的判断。改了一条规则后，skill 好没好，不能靠感觉，要靠数据。
 
-这个框架做的事：
+这个框架做六件事。
 
 1. 建一个虚拟沙盒（假 git 仓库 + 假缺陷系统 + 假日志 + 假经验库）
 2. 定义 12 个测试用例，每条对应一条或几条规则
@@ -48,13 +48,13 @@ python tools/run_regression.py
 
 ### 2. 执行测试用例
 
-两种方式：
+两种方式。
 
-**方式 A：用 subagent（推荐）**
+**方式 A，用 subagent（推荐）**
 
 用 Codely 的 task 工具分派 subagent，每个 subagent 读取 prompt 文件、加载 skill、执行分析、把报告写到 `tests/sandbox/reports/TC-XXX.md`。
 
-**方式 B：手动**
+**方式 B，手动**
 
 读 `tests/sandbox/prompts/TC-XXX.txt`，手动让 AI 执行，把输出保存到 `tests/sandbox/reports/TC-XXX.md`。
 
@@ -70,7 +70,7 @@ python tools/run_regression.py --score TC-001 tests/sandbox/reports/TC-001.md
 
 ### 4. 查看结果
 
-迭代报告在 `tests/results/iteration-XXX.md`，包含：
+迭代报告在 `tests/results/iteration-XXX.md`，含四块内容。
 
 - 总览（通过/部分通过/不通过/平均得分）
 - 逐用例结果
@@ -112,7 +112,7 @@ python tools/run_regression.py --score-all  # 评分
 
 ## 评分逻辑
 
-每个测试用例有若干评分项，每项有权重。评分检查类型：
+每个测试用例有若干评分项，每项有权重。评分检查类型如下。
 
 | 检查类型 | 说明 |
 |----------|------|
