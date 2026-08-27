@@ -1,6 +1,6 @@
 # 打包成 .skill 文件时排除仓库级文件，只留运行时需要的（SKILL.md + references/ + scripts/ + config）
 README.md
-README.en.md
+README.zh.md
 CHANGELOG.md
 CONTRIBUTING.md
 PRODUCT-PLAN.md
