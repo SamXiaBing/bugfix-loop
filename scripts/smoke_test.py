@@ -97,8 +97,9 @@ def test_depth_gate(tmp):
     good = tmp / "good.md"
     good.write_text(
         "# 报告\n\n## 检查动作\n\n| 动作 | 结果 |\n|------|------|\n"
-        + "".join(f"| a{i} | ✅ |\n" for i in range(7))
-        + "".join(f"| b{i} | N/A |\n" for i in range(2)),
+        + "| 读描述和评论 | ✅ |\n| 看附件 | ✅ |\n| 拿运行证据 | ✅ |\n"
+        + "| 搜代码 | ✅ |\n| 读代码 | ✅ |\n| 查最近提交 | ✅ |\n"
+        + "| 确认归谁管 | ✅ |\n| 复现 | N/A |\n| 确认数据真的到了 | N/A |\n",
         encoding="utf-8",
     )
     result = run_py(ROOT / "scripts/depth_gate.py", [str(good)])
@@ -107,7 +108,8 @@ def test_depth_gate(tmp):
     bad = tmp / "bad.md"
     bad.write_text(
         "# 报告\n\n## 检查动作\n\n| 动作 | 结果 |\n|------|------|\n"
-        + "| a | ✅ |\n| b | ✅ |\n| c | ❌ |\n| d | ❌ |\n| e | ❌ |\n",
+        + "| 读描述和评论 | ✅ |\n| 看附件 | ✅ |\n| 搜代码 | ❌ |\n"
+        + "| 读代码 | ❌ |\n| 查最近提交 | ❌ |\n",
         encoding="utf-8",
     )
     result = run_py(ROOT / "scripts/depth_gate.py", [str(bad)])
@@ -115,6 +117,91 @@ def test_depth_gate(tmp):
 
     result_en = run_py(ROOT / "scripts/depth_gate.py", [str(good), "--lang", "en"])
     check("depth_gate en", "Process floor met" in result_en.stdout, result_en.stdout.strip())
+
+    # 否定句。带完成字样的否定不算完成
+    neg = tmp / "neg.md"
+    neg.write_text(
+        "# 报告\n\n## 检查动作\n\n| 动作 | 结果 |\n|------|------|\n"
+        + "| 读描述和评论 | ✅ |\n| 搜代码 | ✅ |\n| 读代码 | 未完成 |\n"
+        + "| 拿运行证据 | 没做 |\n| 查最近提交 | 已完成 |\n| 确认归谁管 | ✅ |\n"
+        + "| 复现 | N/A |\n| 确认数据真的到了 | 不适用 |\n| 看附件 | N/A |\n",
+        encoding="utf-8",
+    )
+    result = run_py(ROOT / "scripts/depth_gate.py", [str(neg)])
+    check(
+        "depth_gate 否定句不算完成",
+        result.returncode == 0
+        and "适用 6 项" in result.stdout
+        and "完成 3 项" in result.stdout
+        and "完成率 50%" in result.stdout,
+        result.stdout.strip(),
+    )
+
+    # 中间态。部分完成按未完成算，并提示人工确认
+    partial = tmp / "partial.md"
+    partial.write_text(
+        "# 报告\n\n## 检查动作\n\n| 动作 | 结果 |\n|------|------|\n"
+        + "| 读描述和评论 | ✅ |\n| 搜代码 | ✅ |\n| 读代码 | ✅ |\n"
+        + "| 拿运行证据 | 部分完成 |\n| 查最近提交 | 进行中 |\n| 确认归谁管 | ✅ |\n"
+        + "| 复现 | N/A |\n| 确认数据真的到了 | N/A |\n| 看附件 | N/A |\n",
+        encoding="utf-8",
+    )
+    result = run_py(ROOT / "scripts/depth_gate.py", [str(partial)])
+    check(
+        "depth_gate 中间态按未完成",
+        result.returncode == 0
+        and "适用 6 项" in result.stdout
+        and "完成 4 项" in result.stdout
+        and "中间态" in result.stdout,
+        result.stdout.strip(),
+    )
+
+    # 无关表格。没有检查动作表时退出码 2，报解析失败
+    wrong = tmp / "wrong.md"
+    wrong.write_text(
+        "# 报告\n\n## 别的表\n\n| 名字 | 值 |\n|------|-----|\n| a | 1 |\n| b | 2 |\n",
+        encoding="utf-8",
+    )
+    result = run_py(ROOT / "scripts/depth_gate.py", [str(wrong)])
+    check(
+        "depth_gate 无关表格退出码2",
+        result.returncode == 2,
+        f"exit={result.returncode}",
+    )
+
+    # 漏项。表格只有三项，报缺哪几项
+    less = tmp / "less.md"
+    less.write_text(
+        "# 报告\n\n## 检查动作\n\n| 动作 | 结果 |\n|------|------|\n"
+        + "| 读描述和评论 | ✅ |\n| 搜代码 | ✅ |\n| 读代码 | ✅ |\n",
+        encoding="utf-8",
+    )
+    result = run_py(ROOT / "scripts/depth_gate.py", [str(less)])
+    check(
+        "depth_gate 漏项警告",
+        result.returncode == 0
+        and "漏项" in result.stdout
+        and "拿运行证据" in result.stdout,
+        result.stdout.strip(),
+    )
+
+    # 无标题锚定。没有「检查动作」标题，靠九项关键词定位
+    nohead = tmp / "nohead.md"
+    nohead.write_text(
+        "# 报告\n\n| 动作 | 结果 |\n|------|------|\n"
+        + "| 读描述和评论 | ✅ |\n| 看附件 | ✅ |\n| 拿运行证据 | ✅ |\n"
+        + "| 搜代码 | ✅ |\n| 读代码 | ✅ |\n| 查最近提交 | ✅ |\n"
+        + "| 确认归谁管 | ✅ |\n| 复现 | N/A |\n| 确认数据真的到了 | N/A |\n",
+        encoding="utf-8",
+    )
+    result = run_py(ROOT / "scripts/depth_gate.py", [str(nohead)])
+    check(
+        "depth_gate 无标题按关键词定位",
+        result.returncode == 0
+        and "关键词定位" in result.stdout
+        and "完成 7 项" in result.stdout,
+        result.stdout.strip(),
+    )
 
 
 def test_lesson_append(tmp):
