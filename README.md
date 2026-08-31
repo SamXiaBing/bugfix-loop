@@ -53,7 +53,7 @@ Other hosts, use their skill directory.
 
 ### First use
 
-Read `references/bootstrap.md`, probe the environment, write `project-config.md`. It records four things, code repos, issue tracker, where you pull tickets from, runtime evidence.
+Read `references/bootstrap.md`, probe the environment, write `project-config.md`. It records six things, code repos, issue tracker, where you pull tickets from, runtime evidence, business type, reference material.
 
 ### Daily use
 

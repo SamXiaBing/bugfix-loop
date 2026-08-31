@@ -53,7 +53,7 @@ git clone https://github.com/SamXiaBing/bugfix-loop ~/.claude/skills/bugfix-loop
 
 ### 第一次用
 
-读 `references/bootstrap.md`，探测环境，写 `project-config.md`。里面记四样东西，代码仓库、缺陷系统、每天从哪里拉单、运行证据。
+读 `references/bootstrap.md`，探测环境，写 `project-config.md`。里面记六样东西，代码仓库、缺陷系统、每天从哪里拉单、运行证据、业务类型、参考资料。
 
 ### 每天用
 

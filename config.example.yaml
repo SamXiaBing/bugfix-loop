@@ -6,6 +6,13 @@
 project:
   name: my-project          # 项目名字，出现在清单标题里
   workdir: /path/to/project # 项目根目录
+  business_type: web        # 业务类型，web / mobile / backend / embedded / game，决定分类法和检查顺序
+  references:               # 参考资料，PRD、接口文档、架构图放哪，没有就删掉这段
+    - /path/to/docs/prd.md
+  business_modules:         # 业务模块清单，冷启动按模块组织历史单，没有就从单子标题归纳
+    - order
+    - payment
+    - login
 
 repos:
   - path: /path/to/project
