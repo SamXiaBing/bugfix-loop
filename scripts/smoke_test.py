@@ -229,6 +229,41 @@ def test_lesson_append(tmp):
     en_ok = first_en.returncode == 0 and "Lesson library" in lessons_en.read_text(encoding="utf-8")
     check("lesson_append en", en_ok, first_en.stdout.strip())
 
+    # 原子写入。追加后原内容完整保留，不留临时文件
+    lessons_atomic = tmp / "lessons_atomic.md"
+    existing = "# 经验库\n\n## 偏差表\n\n| 业务模块 | 偏差类型 | 示例 | 教训 | 分类 | 验证路径 |\n|----------|----------|------|------|------|----------|\n| 旧模块 | 旧偏差 | OLD-1 | 旧教训 | 显示 | 旧路径 |\n"
+    lessons_atomic.write_text(existing, encoding="utf-8")
+    args_atomic = [
+        "--lessons", str(lessons_atomic),
+        "--module", "新模块", "--type", "新偏差", "--example", "NEW-1",
+        "--lesson", "新教训", "--category", "逻辑", "--path", "新路径",
+    ]
+    result = run_py(ROOT / "scripts/lesson_append.py", args_atomic)
+    content = lessons_atomic.read_text(encoding="utf-8")
+    tmp_leftover = list(tmp.glob("lessons_atomic.md.*.tmp"))
+    check(
+        "lesson_append 原子写入保旧内容",
+        result.returncode == 0
+        and "旧模块 | 旧偏差 | OLD-1" in content
+        and "新模块 | 新偏差 | NEW-1" in content
+        and not tmp_leftover,
+        result.stdout.strip(),
+    )
+
+    # 空字段拒绝。字段不全时不写文件，退出码 1
+    lessons_bad = tmp / "lessons_bad.md"
+    before = lessons_bad.exists()
+    result = run_py(
+        ROOT / "scripts/lesson_append.py",
+        ["--lessons", str(lessons_bad), "--module", "m", "--type", "", "--example", "E",
+         "--lesson", "l", "--category", "c", "--path", "p"],
+    )
+    check(
+        "lesson_append 空字段拒绝",
+        result.returncode == 1 and not lessons_bad.exists() and not before,
+        f"exit={result.returncode}",
+    )
+
 
 def test_git(tmp):
     if subprocess.run(["git", "--version"], capture_output=True).returncode != 0:

@@ -131,18 +131,7 @@ def extract_rows(text):
             if rows and looks_like_check_table(rows) >= 3:
                 return rows, "section"
 
-    # 2) 全文找命中九项关键词最多的表格行
-    all_rows = []
-    for i, line in enumerate(lines):
-        if line.strip().startswith("|"):
-            block = parse_table_lines(lines[i:])
-            if block:
-                all_rows.extend(block)
-            # 跳过这个表格
-            while i < len(lines) and lines[i].strip().startswith("|"):
-                i += 1
-
-    # 重新按表格块收集，避免行序混乱
+    # 2) 全文按表格块收集，选命中九项关键词最多的表
     all_rows = []
     i = 0
     while i < len(lines):
