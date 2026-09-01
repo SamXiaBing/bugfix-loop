@@ -35,7 +35,7 @@ Each bug goes through `references/depth-gate.md` and `references/principles/debu
 1. Scan the deviation table in `lessons.md` first. If something matches, follow the verification path directly, do not step the same pit again.
 2. One at a time. Running several at once makes the tracker and browser fight, and attachments get lost.
 3. Classify before locating. Decide which category this bug belongs to (see the principles).
-4. Run the check actions, read description and comments, look at attachments, collect runtime evidence, search code, check recent commits, confirm who owns it, reproduce, confirm data really arrived.
+4. Run the check actions, read description and comments, look at attachments, collect runtime evidence, search code, check recent commits, confirm who owns it, reproduce, confirm data really arrived. Pitfalls when collecting evidence are mechanism-independent, see `references/runtime-evidence.md`.
 5. Give a conclusion, only one of three, not enough info, undetermined, confirmed.
 
 ## Step 4, optional, fix and submit
@@ -47,6 +47,7 @@ Only with the user's permission. Default is read-only, give the root cause and t
 1. Update the main list status.
 2. Write today's report `bugs_YYYY-MM-DD.md`, with the check-action table.
 3. New lessons go into `lessons.md`.
+4. Tell the user where the outputs are. For every file written, report its absolute path. At least three, today's bug list, today's analysis report, the lesson library. The user should not have to hunt for files, the AI reports them as soon as they are written.
 
 ## States of a bug
 
