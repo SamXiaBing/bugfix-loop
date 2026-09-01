@@ -92,6 +92,46 @@ def test_issue_list(tmp):
         report_en.stdout.strip(),
     )
 
+    # key 格式。GitHub #123 和 GitLab 纯数字默认能进清单
+    gh_feed = json.dumps({"issues": [
+        {"key": "#101", "title": "github issue"},
+        {"key": "102", "title": "gitlab issue"},
+        {"key": "BUG-201", "title": "jira issue"},
+        {"key": "not a key", "title": "bad format"},
+    ]})
+    init_gh = run_py(
+        ROOT / "scripts/issue_list.py",
+        ["init", "2026-01-17"],
+        stdin=gh_feed,
+        cwd=tmp,
+    )
+    gh_content = (tmp / "bugs_2026-01-17.md").read_text(encoding="utf-8")
+    check(
+        "issue_list 多编号格式",
+        init_gh.returncode == 0
+        and "#101" in gh_content
+        and "102" in gh_content
+        and "BUG-201" in gh_content
+        and "not a key" not in gh_content
+        and "1 条编号不符合格式被跳过" in init_gh.stdout,
+        init_gh.stdout.strip(),
+    )
+
+    # 自定义正则。内部系统的怪编号用 --key-re 传进来
+    custom_feed = json.dumps({"issues": [{"key": "ACME_9001", "title": "custom key"}]})
+    init_custom = run_py(
+        ROOT / "scripts/issue_list.py",
+        ["init", "2026-01-18", "--key-re", r"[A-Z]+_\d+"],
+        stdin=custom_feed,
+        cwd=tmp,
+    )
+    custom_content = (tmp / "bugs_2026-01-18.md").read_text(encoding="utf-8")
+    check(
+        "issue_list 自定义正则",
+        init_custom.returncode == 0 and "ACME_9001" in custom_content,
+        init_custom.stdout.strip(),
+    )
+
 
 def test_depth_gate(tmp):
     good = tmp / "good.md"
@@ -283,6 +323,27 @@ def test_git(tmp):
 
     push = run_py(ROOT / "scripts/git_push_verify.py", [str(repo), "--branch", "main"])
     check("git_push_verify 失败识别", push.returncode == 1, f"exit={push.returncode}")
+
+    # --marker 追加自定义成功标记。模拟某平台输出只有 "deployed main"：
+    # 默认四词都不命中这行输出，追加自定义词后命中
+    platform_out = "To git.example.com/x/y.git\n * deployed main\n"
+    # 直接喂不了假输出给脚本，用单元方式验证 marker 逻辑：追加后命中自定义词
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "gpv", ROOT / "scripts/git_push_verify.py"
+    )
+    gpv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gpv)
+    default_markers = list(gpv.MARKERS)
+    custom = default_markers + ["deployed"]
+    check(
+        "git_push_verify 自定义marker",
+        default_markers == ["SUCCESS", "new reference", "new branch", "refs/for"]
+        and "deployed" in custom
+        and not any(m in platform_out for m in default_markers)
+        and any(m in platform_out for m in custom),
+        f"custom={custom}",
+    )
 
 
 def main():

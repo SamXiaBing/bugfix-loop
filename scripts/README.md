@@ -18,10 +18,12 @@ python issue_list.py init 2026-01-15 --feed feed.json
 python issue_list.py merge bugs_2026-01-15.md --feed feed.json
 python issue_list.py status bugs_2026-01-15.md BUG-101 确定结论 已定位根因
 python issue_list.py report bugs_2026-01-15.md
+python issue_list.py --key-re "[A-Z]+_\d+" init 2026-01-15 --feed feed.json
 python git_recent.py /path/to/project --days 3 --path Assets/Foo
 python depth_gate.py 当日报告.md
 python lesson_append.py --lessons lessons.md --type 代码逻辑看成配置问题 --example BUG-101 --lesson 先查布局再查代码 --category 显示 --path 先查锚点参数
 python git_push_verify.py /path/to/project
+python git_push_verify.py /path/to/project --marker "deployed main"
 python adapters/example_api.py --demo | python issue_list.py init 2026-01-15
 ```
 
